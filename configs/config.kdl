@@ -1,0 +1,16 @@
+// MSS-Bot Configuration
+
+bot {
+    // Telegram Bot API token (get from @BotFather)
+    token "YOUR_TELEGRAM_BOT_TOKEN"
+}
+
+database {
+    // Path to SQLite database file
+    path "./data/mss-bot.db"
+}
+
+minecraft {
+    // Default query timeout
+    timeout "5s"
+}
