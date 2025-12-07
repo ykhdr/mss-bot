@@ -12,6 +12,8 @@ const (
 	StateMainMenu
 	// StateStatus - server status is displayed
 	StateStatus
+	// StatePlayers - players list is displayed
+	StatePlayers
 	// StateSettings - settings menu is displayed
 	StateSettings
 )

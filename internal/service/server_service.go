@@ -132,6 +132,60 @@ func (r *ServerStatusResult) FormatStatus() string {
 	)
 }
 
+// FormatPlayers formats the player list for display.
+func (r *ServerStatusResult) FormatPlayers() string {
+	if r.Server == nil {
+		return "Сервер не настроен\\. Используйте настройки для добавления сервера\\."
+	}
+
+	serverName := r.Server.Name
+	if serverName == "" {
+		serverName = minecraft.FormatAddress(r.Server.IP, r.Server.Port)
+	}
+
+	if !r.Status.Online {
+		return fmt.Sprintf("🔴 *%s*\n\n"+
+			"Адрес: `%s`\n"+
+			"Статус: Недоступен\n\n"+
+			"❌ Невозможно получить список игроков",
+			escapeMarkdown(serverName),
+			minecraft.FormatAddress(r.Server.IP, r.Server.Port),
+		)
+	}
+
+	header := fmt.Sprintf("👥 *Игроки на сервере*\n\n"+
+		"Сервер: *%s*\n"+
+		"Онлайн: *%d/%d*",
+		escapeMarkdown(serverName),
+		r.Status.Players.Online,
+		r.Status.Players.Max,
+	)
+
+	if r.Status.Players.Online == 0 {
+		return header + "\n\n😴 На сервере никого нет"
+	}
+
+	if len(r.Status.Players.Sample) == 0 {
+		return header + "\n\n⚠️ Список игроков недоступен\n" +
+			"\\(сервер не предоставляет эту информацию\\)"
+	}
+
+	playersStr := "\n\n"
+	for i, p := range r.Status.Players.Sample {
+		playersStr += fmt.Sprintf("%d\\. %s\n", i+1, escapeMarkdown(p.Name))
+	}
+
+	// Add note if there are more players than shown
+	if len(r.Status.Players.Sample) < r.Status.Players.Online {
+		playersStr += fmt.Sprintf("\n_\\.\\.\\. и ещё %d игроков_\n"+
+			"_\\(сервер показывает только образец\\)_",
+			r.Status.Players.Online-len(r.Status.Players.Sample),
+		)
+	}
+
+	return header + playersStr
+}
+
 // FormatConfig formats the server configuration for display.
 func FormatConfig(server *models.Server) string {
 	if server == nil {

@@ -58,12 +58,23 @@ func (h *Handlers) HandleCallback(ctx context.Context, callback *tgbotapi.Callba
 	switch callback.Data {
 	case CallbackStatus:
 		h.showStatus(ctx, chatID, messageID)
+	case CallbackPlayers:
+		h.showPlayers(ctx, chatID, messageID)
 	case CallbackSettings:
 		h.showSettings(ctx, chatID, messageID)
 	case CallbackBack:
 		h.showMainMenu(ctx, chatID, messageID)
 	case CallbackRefresh:
-		h.showStatus(ctx, chatID, messageID)
+		// Refresh based on current state
+		state := h.stateManager.GetState(chatID)
+		switch state {
+		case StateStatus:
+			h.showStatus(ctx, chatID, messageID)
+		case StatePlayers:
+			h.showPlayers(ctx, chatID, messageID)
+		default:
+			h.showStatus(ctx, chatID, messageID)
+		}
 	}
 }
 
@@ -192,27 +203,12 @@ func (h *Handlers) showStatus(ctx context.Context, chatID int64, messageID int) 
 
 	var text string
 	if err != nil {
-		if isNotFound(err) {
-			text = "⚠️ Сервер не настроен\\.\n\nИспользуйте настройки для добавления сервера\\."
-		} else {
-			text = fmt.Sprintf("❌ Ошибка: %v", escapeMarkdownV2(err.Error()))
-		}
+		text = h.formatError(err)
 	} else {
 		text = result.FormatStatus()
 	}
 
-	edit := tgbotapi.NewEditMessageText(chatID, messageID, text)
-	edit.ParseMode = tgbotapi.ModeMarkdownV2
-	edit.ReplyMarkup = pointerTo(StatusKeyboard())
-
-	if _, err := h.bot.Send(edit); err != nil {
-		if strings.Contains(err.Error(), "message is not modified") {
-			// No need to log this as an error
-			return
-		}
-		log.Error().Err(err).Msg("Failed to edit message to status")
-	}
-
+	h.sendEditedMessage(chatID, messageID, text, StatusKeyboard(), "Failed to edit message to status")
 	h.stateManager.SetState(chatID, StateStatus, messageID)
 }
 
@@ -235,6 +231,20 @@ func (h *Handlers) showSettings(ctx context.Context, chatID int64, messageID int
 	}
 
 	h.stateManager.SetState(chatID, StateSettings, messageID)
+}
+
+func (h *Handlers) showPlayers(ctx context.Context, chatID int64, messageID int) {
+	result, err := h.service.GetServerStatus(ctx, chatID)
+
+	var text string
+	if err != nil {
+		text = h.formatError(err)
+	} else {
+		text = result.FormatPlayers()
+	}
+
+	h.sendEditedMessage(chatID, messageID, text, PlayersKeyboard(), "Failed to edit message to players")
+	h.stateManager.SetState(chatID, StatePlayers, messageID)
 }
 
 func isNotFound(err error) bool {
@@ -268,6 +278,35 @@ func escapeMarkdownV2(s string) string {
 		"!", "\\!",
 	)
 	return replacer.Replace(s)
+}
+
+// formatError formats an error message for display
+func (h *Handlers) formatError(err error) string {
+	if isNotFound(err) {
+		return "⚠️ Сервер не настроен\\.\n\nИспользуйте настройки для добавления сервера\\."
+	}
+	return fmt.Sprintf("❌ Ошибка: %v", escapeMarkdownV2(err.Error()))
+}
+
+// sendEditedMessage sends an edited message with error handling
+func (h *Handlers) sendEditedMessage(
+	chatID int64,
+	messageID int,
+	text string,
+	keyboard tgbotapi.InlineKeyboardMarkup,
+	errorMsg string,
+) {
+	edit := tgbotapi.NewEditMessageText(chatID, messageID, text)
+	edit.ParseMode = tgbotapi.ModeMarkdownV2
+	edit.ReplyMarkup = pointerTo(keyboard)
+
+	if _, err := h.bot.Send(edit); err != nil {
+		if strings.Contains(err.Error(), "message is not modified") {
+			// No need to log this as an error
+			return
+		}
+		log.Error().Err(err).Msg(errorMsg)
+	}
 }
 
 // Ensure models is used

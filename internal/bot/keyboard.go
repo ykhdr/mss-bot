@@ -6,6 +6,7 @@ import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 const (
 	CallbackStatus   = "status"
 	CallbackSettings = "settings"
+	CallbackPlayers  = "players"
 	CallbackBack     = "back"
 	CallbackRefresh  = "refresh"
 )
@@ -15,6 +16,9 @@ func MainMenuKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("📊 Статус", CallbackStatus),
+			tgbotapi.NewInlineKeyboardButtonData("👥 Игроки", CallbackPlayers),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("⚙️ Настройки", CallbackSettings),
 		),
 	)
@@ -35,6 +39,18 @@ func StatusKeyboard() tgbotapi.InlineKeyboardMarkup {
 // SettingsKeyboard returns the settings view inline keyboard
 func SettingsKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("◀️ Назад", CallbackBack),
+		),
+	)
+}
+
+// PlayersKeyboard returns the players view inline keyboard
+func PlayersKeyboard() tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🔄 Обновить", CallbackRefresh),
+		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("◀️ Назад", CallbackBack),
 		),
