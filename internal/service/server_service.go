@@ -136,11 +136,11 @@ func (r *ServerStatusResult) FormatStatus() string {
 func FormatConfig(server *models.Server) string {
 	if server == nil {
 		return "⚙️ *Настройки сервера*\n\n" +
-			"Сервер не настроен.\n\n" +
+			"Сервер не настроен\\.\n\n" +
 			"Для настройки отправьте команду:\n" +
 			"`/mss-set <ip>:<port> <name>`\n\n" +
 			"Пример:\n" +
-			"`/mss-set mc.example.com:25565 My Server`"
+			"`/mss-set mc\\.example\\.com:25565 My Server`"
 	}
 
 	serverName := server.Name
