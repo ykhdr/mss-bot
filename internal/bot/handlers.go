@@ -35,8 +35,8 @@ func (h *Handlers) HandleCommand(ctx context.Context, message *tgbotapi.Message)
 	switch message.Command() {
 	case "mss":
 		h.handleMSS(ctx, message)
-	case "mss-set":
-		h.handleMSSSet(ctx, message)
+	case "set":
+		h.handleSet(ctx, message)
 	case "start":
 		h.handleStart(ctx, message)
 	case "help":
@@ -108,7 +108,7 @@ func (h *Handlers) handleMSS(ctx context.Context, message *tgbotapi.Message) {
 	h.stateManager.SetState(message.Chat.ID, StateMainMenu, sent.MessageID)
 }
 
-func (h *Handlers) handleMSSSet(ctx context.Context, message *tgbotapi.Message) {
+func (h *Handlers) handleSet(ctx context.Context, message *tgbotapi.Message) {
 	chatID := message.Chat.ID
 
 	// Check if we're in settings state
@@ -206,6 +206,10 @@ func (h *Handlers) showStatus(ctx context.Context, chatID int64, messageID int) 
 	edit.ReplyMarkup = pointerTo(StatusKeyboard())
 
 	if _, err := h.bot.Send(edit); err != nil {
+		if strings.Contains(err.Error(), "message is not modified") {
+			// No need to log this as an error
+			return
+		}
 		log.Error().Err(err).Msg("Failed to edit message to status")
 	}
 
