@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/ykhdr/mss-bot/internal/minecraft"
 	"github.com/ykhdr/mss-bot/internal/storage"
 	"github.com/ykhdr/mss-bot/internal/storage/models"
@@ -25,11 +27,14 @@ func NewServerService(storage storage.ServerStorage, mc *minecraft.Client) *Serv
 
 // GetServerConfig returns the server configuration for a chat
 func (s *ServerService) GetServerConfig(ctx context.Context, chatID int64) (*models.Server, error) {
+	log.Debug().Int64("chat_id", chatID).Msg("getting server config")
 	return s.storage.GetByChatID(ctx, chatID)
 }
 
 // SetServerConfig sets or updates the server configuration for a chat
 func (s *ServerService) SetServerConfig(ctx context.Context, chatID int64, ip string, port int, name string) error {
+	log.Info().Int64("chat_id", chatID).Str("ip", ip).Int("port", port).Str("name", name).Msg("setting server config")
+
 	server := &models.Server{
 		ChatID: chatID,
 		IP:     ip,
@@ -42,13 +47,18 @@ func (s *ServerService) SetServerConfig(ctx context.Context, chatID int64, ip st
 
 // GetServerStatus returns the status of the configured server for a chat
 func (s *ServerService) GetServerStatus(ctx context.Context, chatID int64) (*ServerStatusResult, error) {
+	log.Debug().Int64("chat_id", chatID).Msg("getting server status")
+
 	server, err := s.storage.GetByChatID(ctx, chatID)
 	if err != nil {
+		log.Warn().Err(err).Int64("chat_id", chatID).Msg("server config not found for status check")
 		return nil, err
 	}
 
+	log.Debug().Int64("chat_id", chatID).Str("ip", server.IP).Int("port", server.Port).Msg("querying minecraft server")
 	status, err := s.mc.GetStatus(ctx, server.IP, server.Port)
 	if err != nil {
+		log.Warn().Err(err).Int64("chat_id", chatID).Str("ip", server.IP).Int("port", server.Port).Msg("minecraft server query failed")
 		return &ServerStatusResult{
 			Server: server,
 			Status: &minecraft.ServerStatus{Online: false},
@@ -56,6 +66,7 @@ func (s *ServerService) GetServerStatus(ctx context.Context, chatID int64) (*Ser
 		}, nil
 	}
 
+	log.Info().Int64("chat_id", chatID).Str("ip", server.IP).Int("port", server.Port).Bool("online", status.Online).Int("players", status.Players.Online).Msg("minecraft server status retrieved")
 	return &ServerStatusResult{
 		Server: server,
 		Status: status,

@@ -12,6 +12,12 @@ type Config struct {
 	Bot       BotConfig
 	Database  DatabaseConfig
 	Minecraft MinecraftConfig
+	Logging   LoggingConfig
+}
+
+// LoggingConfig contains logging settings
+type LoggingConfig struct {
+	Level string
 }
 
 // BotConfig contains Telegram bot settings
@@ -34,6 +40,11 @@ type kdlConfig struct {
 	Bot       kdlBotConfig       `kdl:"bot"`
 	Database  kdlDatabaseConfig  `kdl:"database"`
 	Minecraft kdlMinecraftConfig `kdl:"minecraft"`
+	Logging   kdlLoggingConfig   `kdl:"logging"`
+}
+
+type kdlLoggingConfig struct {
+	Level string `kdl:"level"`
 }
 
 type kdlBotConfig struct {
@@ -72,6 +83,9 @@ func Load(path string) (*Config, error) {
 		Minecraft: MinecraftConfig{
 			Timeout: timeout,
 		},
+		Logging: LoggingConfig{
+			Level: kdlCfg.Logging.Level,
+		},
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -95,5 +109,19 @@ func (c *Config) validate() error {
 		c.Minecraft.Timeout = 5 * time.Second
 	}
 
+	if c.Logging.Level == "" {
+		c.Logging.Level = "info"
+	}
+
 	return nil
+}
+
+// String returns a string representation of the configuration (for logging)
+func (c *Config) String() string {
+	return fmt.Sprintf(
+		"Bot.Token: [REDACTED], Database.Path: %s, Minecraft.Timeout: %s, Logging.Level: %s",
+		c.Database.Path,
+		c.Minecraft.Timeout,
+		c.Logging.Level,
+	)
 }
