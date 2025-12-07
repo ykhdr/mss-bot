@@ -67,7 +67,7 @@ func (h *Handlers) HandleCallback(ctx context.Context, callback *tgbotapi.Callba
 	}
 }
 
-func (h *Handlers) handleStart(ctx context.Context, message *tgbotapi.Message) {
+func (h *Handlers) handleStart(_ context.Context, message *tgbotapi.Message) {
 	text := "👋 Привет! Я бот для проверки статуса Minecraft серверов.\n\n" +
 		"Используйте /mss для открытия меню."
 
@@ -77,7 +77,7 @@ func (h *Handlers) handleStart(ctx context.Context, message *tgbotapi.Message) {
 	}
 }
 
-func (h *Handlers) handleHelp(ctx context.Context, message *tgbotapi.Message) {
+func (h *Handlers) handleHelp(_ context.Context, message *tgbotapi.Message) {
 	text := "📖 *Справка*\n\n" +
 		"*Команды:*\n" +
 		"/mss \\- Открыть главное меню\n" +
@@ -92,7 +92,7 @@ func (h *Handlers) handleHelp(ctx context.Context, message *tgbotapi.Message) {
 	}
 }
 
-func (h *Handlers) handleMSS(ctx context.Context, message *tgbotapi.Message) {
+func (h *Handlers) handleMSS(_ context.Context, message *tgbotapi.Message) {
 	text := "🎮 *Minecraft Server Status*\n\nВыберите действие:"
 
 	msg := tgbotapi.NewMessage(message.Chat.ID, text)
@@ -173,7 +173,7 @@ func (h *Handlers) handleSet(ctx context.Context, message *tgbotapi.Message) {
 	}
 }
 
-func (h *Handlers) showMainMenu(ctx context.Context, chatID int64, messageID int) {
+func (h *Handlers) showMainMenu(_ context.Context, chatID int64, messageID int) {
 	text := "🎮 *Minecraft Server Status*\n\nВыберите действие:"
 
 	edit := tgbotapi.NewEditMessageText(chatID, messageID, text)

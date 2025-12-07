@@ -47,7 +47,7 @@ func (b *Bot) Start(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case update := <-updates:
-			b.processUpdate(ctx, update)
+			b.processUpdate(ctx, &update)
 		}
 	}
 }
@@ -57,7 +57,7 @@ func (b *Bot) Stop() {
 	b.api.StopReceivingUpdates()
 }
 
-func (b *Bot) processUpdate(ctx context.Context, update tgbotapi.Update) {
+func (b *Bot) processUpdate(ctx context.Context, update *tgbotapi.Update) {
 	if update.Message != nil {
 		if update.Message.IsCommand() {
 			b.handlers.HandleCommand(ctx, update.Message)
