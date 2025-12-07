@@ -42,9 +42,6 @@ linters-settings:
   lll:
     line-length: 120
 
-  unused:
-    go: "1.23"
-
   unparam:
     check-exported: false
 
