@@ -111,7 +111,7 @@ func TestFormatConfig_NoServer(t *testing.T) {
 	result := FormatConfig(nil)
 
 	assert.Contains(t, result, "Сервер не настроен")
-	assert.Contains(t, result, "/mss-set")
+	assert.Contains(t, result, "/set")
 }
 
 func TestFormatConfig_WithServer(t *testing.T) {

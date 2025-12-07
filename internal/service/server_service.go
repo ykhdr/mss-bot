@@ -138,9 +138,9 @@ func FormatConfig(server *models.Server) string {
 		return "⚙️ *Настройки сервера*\n\n" +
 			"Сервер не настроен\\.\n\n" +
 			"Для настройки отправьте команду:\n" +
-			"`/mss-set <ip>:<port> <name>`\n\n" +
+			"`/set <ip>:<port> <name>`\n\n" +
 			"Пример:\n" +
-			"`/mss-set mc\\.example\\.com:25565 My Server`"
+			"`/set mc\\.example\\.com:25565 My Server`"
 	}
 
 	serverName := server.Name
@@ -153,7 +153,7 @@ func FormatConfig(server *models.Server) string {
 		"Порт: `%d`\n"+
 		"Название: %s\n\n"+
 		"Для изменения отправьте команду:\n"+
-		"`/mss-set <ip>:<port> <name>`",
+		"`/set <ip>:<port> <name>`",
 		server.IP,
 		server.Port,
 		escapeMarkdown(serverName),
