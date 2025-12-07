@@ -9,19 +9,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Client is a Minecraft server status client
+// Client is a Minecraft server status client.
 type Client struct {
 	timeout time.Duration
 }
 
-// NewClient creates a new Minecraft client with the specified timeout
+// NewClient creates a new Minecraft client with the specified timeout.
 func NewClient(timeout time.Duration) *Client {
 	return &Client{
 		timeout: timeout,
 	}
 }
 
-// GetStatus queries the Minecraft server and returns its status
+// GetStatus queries the Minecraft server and returns its status.
 func (c *Client) GetStatus(ctx context.Context, host string, port int) (*ServerStatus, error) {
 	log.Debug().Str("host", host).Int("port", port).Dur("timeout", c.timeout).Msg("starting minecraft server query")
 
@@ -44,7 +44,7 @@ func (c *Client) GetStatus(ctx context.Context, host string, port int) (*ServerS
 
 	select {
 	case <-ctx.Done():
-		log.Warn().Str("host", host).Int("port", port).Msg("minecraft query cancelled")
+		log.Warn().Str("host", host).Int("port", port).Msg("minecraft query canceled")
 		return &ServerStatus{Online: false}, ctx.Err()
 	case res := <-resultCh:
 		if res.err != nil {
@@ -53,12 +53,18 @@ func (c *Client) GetStatus(ctx context.Context, host string, port int) (*ServerS
 		}
 
 		status := c.convertStatus(res.status)
-		log.Debug().Str("host", host).Int("port", port).Bool("online", status.Online).Str("version", status.Version).Int("players", status.Players.Online).Msg("minecraft server query successful")
+		log.Debug().
+			Str("host", host).
+			Int("port", port).
+			Bool("online", status.Online).
+			Str("version", status.Version).
+			Int("players", status.Players.Online).
+			Msg("minecraft server query successful")
 		return status, nil
 	}
 }
 
-// convertStatus converts minequery status to our internal status format
+// convertStatus converts minequery status to our internal status format.
 func (c *Client) convertStatus(status *minequery.Status17) *ServerStatus {
 	if status == nil {
 		return &ServerStatus{Online: false}
@@ -68,7 +74,7 @@ func (c *Client) convertStatus(status *minequery.Status17) *ServerStatus {
 		Online:      true,
 		Version:     status.VersionName,
 		Protocol:    status.ProtocolVersion,
-		Description: status.DescriptionText(),
+		Description: status.Description.String(),
 		Players: PlayersInfo{
 			Online: status.OnlinePlayers,
 			Max:    status.MaxPlayers,
@@ -86,7 +92,7 @@ func (c *Client) convertStatus(status *minequery.Status17) *ServerStatus {
 	return serverStatus
 }
 
-// Ping checks if the server is reachable
+// Ping checks if the server is reachable.
 func (c *Client) Ping(ctx context.Context, host string, port int) (bool, error) {
 	log.Debug().Str("host", host).Int("port", port).Msg("pinging minecraft server")
 	status, err := c.GetStatus(ctx, host, port)
@@ -99,7 +105,7 @@ func (c *Client) Ping(ctx context.Context, host string, port int) (bool, error) 
 	return status.Online, nil
 }
 
-// FormatAddress formats host and port into a connection string
+// FormatAddress formats host and port into a connection string.
 func FormatAddress(host string, port int) string {
 	if port == 25565 {
 		return host
@@ -107,7 +113,7 @@ func FormatAddress(host string, port int) string {
 	return fmt.Sprintf("%s:%d", host, port)
 }
 
-// ParseAddress parses a connection string into host and port
+// ParseAddress parses a connection string into host and port.
 func ParseAddress(address string) (host string, port int, err error) {
 	log.Debug().Str("address", address).Msg("parsing minecraft address")
 

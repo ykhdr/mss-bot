@@ -1,0 +1,153 @@
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+  govet:
+    settings:
+      printf:
+        funcs:
+          - (github.com/rs/zerolog/log.Logger).Printf
+
+  gofmt:
+    simplify: true
+
+  goimports:
+    local-prefixes: github.com/ykhdr/mss-bot
+
+  gocyclo:
+    min-complexity: 15
+
+  dupl:
+    threshold: 100
+
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+
+  misspell:
+    locale: US
+
+  lll:
+    line-length: 120
+
+  unused:
+    go: "1.23"
+
+  unparam:
+    check-exported: false
+
+  nakedret:
+    max-func-lines: 30
+
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: false
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - wrapperFunc
+      - dupImport
+      - ifElseChain
+      - octalLiteral
+
+  funlen:
+    lines: 100
+    statements: 50
+
+linters:
+  enable:
+    # Default linters
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+
+    # Additional useful linters
+    - asciicheck
+    - bodyclose
+    - dupl
+    - copyloopvar
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - gofmt
+    - goimports
+    - gosec
+    - lll
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - prealloc
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - unparam
+    - whitespace
+
+  disable:
+    - gochecknoinits
+    - gochecknoglobals
+
+issues:
+  exclude-dirs:
+    - vendor
+  exclude-files:
+    - ".*_test.go"
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+        - funlen
+
+    # Exclude certain rules for specific files
+    - path: internal/storage/sqlite/migrations\.go
+      linters:
+        - lll
+        - goconst
+
+    # Exclude shadow checking on type switch variables
+    - text: "shadow: declaration of \"err\" shadows declaration at"
+      linters:
+        - govet
+
+  # Show only new issues created after git revision `REV`
+  # new-from-rev: REV
+
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0
+
+  # Show only new issues created in git patch with set file path
+  # new-from-patch: path/to/patch/file

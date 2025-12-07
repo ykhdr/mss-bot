@@ -16,13 +16,13 @@ import (
 	"github.com/ykhdr/mss-bot/internal/storage/models"
 )
 
-// Storage implements ServerStorage interface using SQLite
+// Storage implements ServerStorage interface using SQLite.
 type Storage struct {
 	db *sql.DB
 	sb squirrel.StatementBuilderType
 }
 
-// New creates a new SQLite storage instance
+// New creates a new SQLite storage instance.
 func New(dbPath string) (*Storage, error) {
 	// Ensure directory exists
 	dir := filepath.Dir(dbPath)
@@ -60,7 +60,7 @@ func New(dbPath string) (*Storage, error) {
 	}, nil
 }
 
-// GetByChatID returns server configuration for a specific chat
+// GetByChatID returns server configuration for a specific chat.
 func (s *Storage) GetByChatID(ctx context.Context, chatID int64) (*models.Server, error) {
 	log.Debug().Int64("chat_id", chatID).Msg("getting server config by chat_id")
 
@@ -97,9 +97,14 @@ func (s *Storage) GetByChatID(ctx context.Context, chatID int64) (*models.Server
 	return &server, nil
 }
 
-// Upsert creates or updates server configuration for a chat
+// Upsert creates or updates server configuration for a chat.
 func (s *Storage) Upsert(ctx context.Context, server *models.Server) error {
-	log.Debug().Int64("chat_id", server.ChatID).Str("ip", server.IP).Int("port", server.Port).Str("name", server.Name).Msg("upserting server config")
+	log.Debug().
+		Int64("chat_id", server.ChatID).
+		Str("ip", server.IP).
+		Int("port", server.Port).
+		Str("name", server.Name).
+		Msg("upserting server config")
 
 	now := time.Now()
 
@@ -170,7 +175,7 @@ func (s *Storage) Upsert(ctx context.Context, server *models.Server) error {
 	return nil
 }
 
-// Delete removes server configuration for a chat
+// Delete removes server configuration for a chat.
 func (s *Storage) Delete(ctx context.Context, chatID int64) error {
 	log.Debug().Int64("chat_id", chatID).Msg("deleting server config")
 
@@ -193,7 +198,7 @@ func (s *Storage) Delete(ctx context.Context, chatID int64) error {
 	return nil
 }
 
-// Close closes the database connection
+// Close closes the database connection.
 func (s *Storage) Close() error {
 	log.Debug().Msg("closing database connection")
 	return s.db.Close()

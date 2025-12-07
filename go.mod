@@ -5,8 +5,8 @@ go 1.23
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/dreamscached/minequery/v2 v2.5.0
-	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/mattn/go-sqlite3 v1.14.24
+	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.10.0
 	github.com/ykhdr/kdl-config v1.1.0
 )
@@ -21,7 +21,6 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/sblinch/kdl-go v0.0.0-20240410000746-21754ba9ac55 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
