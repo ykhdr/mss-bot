@@ -5,7 +5,6 @@
 *.so
 *.dylib
 mss-bot
-bot
 
 # Build output
 /bin/
